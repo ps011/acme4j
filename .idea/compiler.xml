@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="acme4j-client" />
+        <module name="acme4j-example" />
+        <module name="acme4j-utils" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="acme4j" target="1.8" />
+      <module name="acme4j-client" target="1.8" />
+      <module name="acme4j-example" target="1.8" />
+      <module name="acme4j-utils" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

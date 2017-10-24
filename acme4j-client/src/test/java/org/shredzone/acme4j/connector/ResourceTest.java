@@ -31,7 +31,7 @@ public class ResourceTest {
         assertThat(Resource.KEY_CHANGE.path(), is("key-change"));
         assertThat(Resource.NEW_AUTHZ.path(), is("new-authz"));
         assertThat(Resource.NEW_CERT.path(), is("new-cert"));
-        assertThat(Resource.NEW_REG.path(), is("new-reg"));
+        assertThat(Resource.NEW_REG.path(), is("new-account"));
         assertThat(Resource.REVOKE_CERT.path(), is("revoke-cert"));
 
         // fails if there are untested future Resource values

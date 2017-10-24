@@ -19,10 +19,11 @@ package org.shredzone.acme4j.connector;
 public enum Resource {
 
     KEY_CHANGE("key-change"),
-    NEW_REG("new-reg"),
+    NEW_REG("new-account"),
     NEW_AUTHZ("new-authz"),
-    NEW_CERT("new-cert"),
-    REVOKE_CERT("revoke-cert");
+    NEW_CERT("new-order"),
+    REVOKE_CERT("revoke-cert"),
+    NEW_NONCE("new-nonce");
 
     private final String path;
 

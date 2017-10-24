@@ -204,7 +204,7 @@ public class SessionTest {
         };
 
         assertThat(session.resourceUri(Resource.NEW_REG),
-                        is(URI.create("https://example.com/acme/new-reg")));
+                        is(URI.create("https://example.com/acme/new-account")));
         assertThat(session.resourceUri(Resource.NEW_AUTHZ),
                         is(URI.create("https://example.com/acme/new-authz")));
         assertThat(session.resourceUri(Resource.NEW_CERT),
@@ -228,7 +228,7 @@ public class SessionTest {
      */
     private void assertSession(Session session) throws AcmeException {
         assertThat(session.resourceUri(Resource.NEW_REG),
-                        is(URI.create("https://example.com/acme/new-reg")));
+                        is(URI.create("https://example.com/acme/new-account")));
         assertThat(session.resourceUri(Resource.NEW_AUTHZ),
                         is(URI.create("https://example.com/acme/new-authz")));
         assertThat(session.resourceUri(Resource.NEW_CERT),

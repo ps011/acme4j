@@ -13,10 +13,17 @@
  */
 package org.shredzone.acme4j.connector;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jwx.CompactSerializer;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.shredzone.acme4j.Session;
+import org.shredzone.acme4j.exception.*;
+import org.shredzone.acme4j.util.JSON;
+import org.shredzone.acme4j.util.JSONBuilder;
+import org.shredzone.acme4j.util.TestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,35 +34,20 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
-import org.jose4j.base64url.Base64Url;
-import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwx.CompactSerializer;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.shredzone.acme4j.Session;
-import org.shredzone.acme4j.exception.AcmeException;
-import org.shredzone.acme4j.exception.AcmeNetworkException;
-import org.shredzone.acme4j.exception.AcmeProtocolException;
-import org.shredzone.acme4j.exception.AcmeRetryAfterException;
-import org.shredzone.acme4j.exception.AcmeServerException;
-import org.shredzone.acme4j.util.JSON;
-import org.shredzone.acme4j.util.JSONBuilder;
-import org.shredzone.acme4j.util.TestUtils;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.*;
+import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
 
 /**
  * Unit tests for {@link DefaultConnection}.
  */
 public class DefaultConnectionTest {
 
-    private URI requestUri = URI.create("http://example.com/acme/");;
+    private URI requestUri = URI.create("http://localhost:8000/acme/directory");
     private HttpURLConnection mockUrlConnection;
     private HttpConnector mockHttpConnection;
     private Session session;
@@ -139,7 +131,7 @@ public class DefaultConnectionTest {
     @Test
     public void testGetAbsoluteLocation() throws Exception {
         when(mockUrlConnection.getHeaderField("Location")).thenReturn("https://example.com/otherlocation");
-        when(mockUrlConnection.getURL()).thenReturn(new URL("https://example.org/acme"));
+        when(mockUrlConnection.getURL()).thenReturn(new URL("https://localhost:8000/acme"));
 
         try (DefaultConnection conn = new DefaultConnection(mockHttpConnection)) {
             conn.conn = mockUrlConnection;
@@ -525,6 +517,7 @@ public class DefaultConnectionTest {
         }) {
             JSONBuilder cb = new JSONBuilder();
             cb.put("foo", 123).put("bar", "a-string");
+            //Test-1
             conn.sendSignedRequest(requestUri, cb, DefaultConnectionTest.this.session);
         }
 
@@ -576,6 +569,7 @@ public class DefaultConnectionTest {
     public void testSendSignedRequestNoNonce() throws Exception {
         try (DefaultConnection conn = new DefaultConnection(mockHttpConnection)) {
             JSONBuilder cb = new JSONBuilder();
+
             conn.sendSignedRequest(requestUri, cb, DefaultConnectionTest.this.session);
         }
     }

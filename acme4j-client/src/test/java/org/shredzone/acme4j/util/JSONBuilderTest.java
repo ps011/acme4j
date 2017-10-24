@@ -98,9 +98,9 @@ public class JSONBuilderTest {
         JSONBuilder res;
 
         JSONBuilder cb = new JSONBuilder();
-        res = cb.putResource("new-reg");
+        res = cb.putResource("new-account");
         assertThat(res, is(sameInstance(cb)));
-        assertThat(cb.toString(), is("{\"resource\":\"new-reg\"}"));
+        assertThat(cb.toString(), is("{\"resource\":\"new-account\"}"));
 
         res = cb.putResource(Resource.NEW_AUTHZ);
         assertThat(res, is(sameInstance(cb)));

@@ -13,20 +13,6 @@
  */
 package org.shredzone.acme4j;
 
-import static org.shredzone.acme4j.util.AcmeUtils.*;
-
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.security.KeyPair;
-import java.security.cert.X509Certificate;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.lang.JoseException;
@@ -40,6 +26,17 @@ import org.shredzone.acme4j.util.JSON;
 import org.shredzone.acme4j.util.JSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyPair;
+import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.util.*;
+
+import static org.shredzone.acme4j.util.AcmeUtils.keyAlgorithm;
+import static org.shredzone.acme4j.util.AcmeUtils.toAce;
 
 /**
  * Represents a registration at the ACME server.
@@ -152,14 +149,19 @@ public class Registration extends AcmeResource {
         LOG.debug("update");
         try (Connection conn = getSession().provider().connect()) {
             JSONBuilder claims = new JSONBuilder();
-            claims.putResource("reg");
+            claims.putResource("account");
+            ArrayList<URI> contacts = new ArrayList<URI>();
+            contacts.add(new URI("tel:1234567890"));
+            claims.put("contacts", contacts);
 
             conn.sendSignedRequest(getLocation(), claims, getSession());
-            conn.accept(HttpURLConnection.HTTP_CREATED, HttpURLConnection.HTTP_ACCEPTED);
+            conn.accept(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_ACCEPTED);
 
             JSON json = conn.readJsonResponse();
             unmarshal(json, conn);
-         }
+         } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -317,7 +319,7 @@ public class Registration extends AcmeResource {
         LOG.debug("deactivate");
         try (Connection conn = getSession().provider().connect()) {
             JSONBuilder claims = new JSONBuilder();
-            claims.putResource("reg");
+            claims.putResource("account");
             claims.put(KEY_STATUS, "deactivated");
 
             conn.sendSignedRequest(getLocation(), claims, getSession());
@@ -455,7 +457,7 @@ public class Registration extends AcmeResource {
             LOG.debug("modify/commit");
             try (Connection conn = getSession().provider().connect()) {
                 JSONBuilder claims = new JSONBuilder();
-                claims.putResource("reg");
+                claims.putResource("account");
                 if (!editContacts.isEmpty()) {
                     claims.put(KEY_CONTACT, editContacts);
                 }

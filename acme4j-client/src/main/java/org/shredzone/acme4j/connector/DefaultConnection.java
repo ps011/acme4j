@@ -13,50 +13,32 @@
  */
 package org.shredzone.acme4j.connector;
 
-import static org.shredzone.acme4j.util.AcmeUtils.keyAlgorithm;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.KeyPair;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.lang.JoseException;
 import org.shredzone.acme4j.Session;
-import org.shredzone.acme4j.exception.AcmeAgreementRequiredException;
-import org.shredzone.acme4j.exception.AcmeConflictException;
-import org.shredzone.acme4j.exception.AcmeException;
-import org.shredzone.acme4j.exception.AcmeNetworkException;
-import org.shredzone.acme4j.exception.AcmeProtocolException;
-import org.shredzone.acme4j.exception.AcmeRateLimitExceededException;
-import org.shredzone.acme4j.exception.AcmeRetryAfterException;
-import org.shredzone.acme4j.exception.AcmeServerException;
-import org.shredzone.acme4j.exception.AcmeUnauthorizedException;
+import org.shredzone.acme4j.exception.*;
 import org.shredzone.acme4j.util.AcmeUtils;
 import org.shredzone.acme4j.util.JSON;
 import org.shredzone.acme4j.util.JSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.*;
+import java.security.KeyPair;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.shredzone.acme4j.util.AcmeUtils.keyAlgorithm;
 
 /**
  * Default implementation of {@link Connection}.
@@ -124,8 +106,8 @@ public class DefaultConnection implements Connection {
             KeyPair keypair = session.getKeyPair();
 
             if (session.getNonce() == null) {
-                LOG.debug("Getting initial nonce, HEAD {}", uri);
-                conn = httpConnector.openConnection(uri);
+                LOG.debug("Getting initial nonce, HEAD {}", session.resourceUri(Resource.NEW_NONCE));
+                conn = httpConnector.openConnection(session.resourceUri(Resource.NEW_NONCE));
                 conn.setRequestMethod("HEAD");
                 conn.setRequestProperty(ACCEPT_LANGUAGE_HEADER, session.getLocale().toLanguageTag());
                 conn.connect();
@@ -157,7 +139,7 @@ public class DefaultConnection implements Connection {
             jws.setAlgorithmHeaderValue(keyAlgorithm(jwk));
             jws.setKey(keypair.getPrivate());
             byte[] outputData = jws.getCompactSerialization().getBytes(DEFAULT_CHARSET);
-
+            System.out.println(new String(outputData));
             conn.setFixedLengthStreamingMode(outputData.length);
             conn.connect();
 
@@ -207,7 +189,7 @@ public class DefaultConnection implements Connection {
         assertConnectionIsOpen();
 
         String contentType = conn.getHeaderField(CONTENT_TYPE_HEADER);
-        if (!("application/json".equals(contentType)
+        if (!("application/json; charset=utf-8".equals(contentType)
                     || "application/problem+json".equals(contentType))) {
             throw new AcmeProtocolException("Unexpected content type: " + contentType);
         }

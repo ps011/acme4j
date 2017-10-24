@@ -13,20 +13,6 @@
  */
 package org.shredzone.acme4j;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.net.URI;
-import java.security.KeyPair;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Collection;
-
-import javax.swing.JOptionPane;
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.shredzone.acme4j.challenge.Challenge;
 import org.shredzone.acme4j.challenge.Dns01Challenge;
@@ -38,6 +24,16 @@ import org.shredzone.acme4j.util.CertificateUtils;
 import org.shredzone.acme4j.util.KeyPairUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyPair;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * A simple client test tool.
@@ -51,7 +47,7 @@ public class ClientTest {
     // File name of the Domain Key Pair
     private static final File DOMAIN_KEY_FILE = new File("domain.key");
 
-    // File name of the CSR
+    // File name of the CSR/d;//
     private static final File DOMAIN_CSR_FILE = new File("domain.csr");
 
     // File name of the signed certificate
@@ -74,7 +70,7 @@ public class ClientTest {
      * @param domains
      *            Domains to get a common certificate for
      */
-    public void fetchCertificate(Collection<String> domains) throws IOException, AcmeException {
+    public void fetchCertificate(Collection<String> domains) throws IOException, AcmeException, URISyntaxException {
         // Load the user key file. If there is no key file, create a new one.
         // Keep this key pair in a safe place! In a production environment, you will not be
         // able to access your account again if you should lose the key pair.
@@ -82,16 +78,18 @@ public class ClientTest {
 
         // Create a session for Let's Encrypt.
         // Use "acme://letsencrypt.org" for production server
-        Session session = new Session("acme://letsencrypt.org/staging", userKeyPair);
+        Session session = new Session("http://localhost:8000/acme/directory", userKeyPair);
 
         // Get the Registration to the account.
         // If there is no account yet, create a new one.
         Registration reg = findOrRegisterAccount(session);
+        reg.update();
 
+        //TODO : Commented This
         // Separately authorize every requested domain.
-        for (String domain : domains) {
-            authorize(reg, domain);
-        }
+//        for (String domain : domains) {
+//            authorize(reg, domain);
+//        }
 
         // Load or create a key pair for the domains. This should not be the userKeyPair!
         KeyPair domainKeyPair = loadOrCreateKeyPair(DOMAIN_KEY_FILE);
@@ -159,7 +157,7 @@ public class ClientTest {
      *            {@link Session} to bind with
      * @return {@link Registration} connected to your account
      */
-    private Registration findOrRegisterAccount(Session session) throws AcmeException {
+    private Registration findOrRegisterAccount(Session session) throws AcmeException, URISyntaxException {
         Registration reg;
 
         try {
@@ -169,9 +167,10 @@ public class ClientTest {
 
             // This is a new account. Let the user accept the Terms of Service.
             // We won't be able to authorize domains until the ToS is accepted.
-            URI agreement = reg.getAgreement();
-            LOG.info("Terms of Service: " + agreement);
-            acceptAgreement(reg, agreement);
+            //TODO : Commented this
+//            URI agreement = reg.getAgreement();
+    //        LOG.info("Terms of Service: " + agreement);
+  //          acceptAgreement(reg, agreement);
 
         } catch (AcmeConflictException ex) {
             // The Key Pair is already registered. getLocation() contains the

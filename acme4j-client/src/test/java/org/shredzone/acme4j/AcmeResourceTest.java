@@ -13,8 +13,8 @@
  */
 package org.shredzone.acme4j;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import org.junit.Test;
+import org.shredzone.acme4j.util.TestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,8 +22,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
 
-import org.junit.Test;
-import org.shredzone.acme4j.util.TestUtils;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Unit tests for {@link AcmeResource}.
@@ -36,7 +37,7 @@ public class AcmeResourceTest {
     @Test
     public void testConstructor() throws Exception {
         Session session = TestUtils.session();
-        URI location = new URI("http://example.com/acme/resource");
+        URI location = new URI("http://localhost:8000/acme/directory");
 
         try {
             new DummyResource(null);

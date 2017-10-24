@@ -13,20 +13,22 @@
  */
 package org.shredzone.acme4j.util;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.json.JsonUtil;
+import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.JsonWebKey.OutputControlLevel;
+import org.shredzone.acme4j.Session;
+import org.shredzone.acme4j.provider.AcmeProvider;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -38,16 +40,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.jose4j.base64url.Base64Url;
-import org.jose4j.json.JsonUtil;
-import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwk.JsonWebKey.OutputControlLevel;
-import org.shredzone.acme4j.Session;
-import org.shredzone.acme4j.provider.AcmeProvider;
 
 /**
  * Some utility methods for unit tests.
@@ -63,7 +55,7 @@ public final class TestUtils {
     public static final String D_KTY = "RSA";
     public static final String D_THUMBPRINT = "0VPbh7-I6swlkBu0TrNKSQp6d69bukzeQA0ksuX3FFs";
 
-    public static final String ACME_SERVER_URI = "https://example.com/acme";
+    public static final String ACME_SERVER_URI = "https://localhost:8000/acme";
 
     private static final ResourceBundle JSON_RESOURCE = ResourceBundle.getBundle("json");
 

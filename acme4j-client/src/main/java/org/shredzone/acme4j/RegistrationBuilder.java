@@ -13,11 +13,6 @@
  */
 package org.shredzone.acme4j;
 
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.shredzone.acme4j.connector.Connection;
 import org.shredzone.acme4j.connector.Resource;
 import org.shredzone.acme4j.exception.AcmeConflictException;
@@ -25,6 +20,12 @@ import org.shredzone.acme4j.exception.AcmeException;
 import org.shredzone.acme4j.util.JSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A builder for a new account registration.
@@ -73,13 +74,15 @@ public class RegistrationBuilder {
      *             {@link AcmeConflictException#getLocation()} contains the registration's
      *             location URI.
      */
-    public Registration create(Session session) throws AcmeException {
+    public Registration create(Session session) throws AcmeException, URISyntaxException {
         LOG.debug("create");
 
         try (Connection conn = session.provider().connect()) {
             JSONBuilder claims = new JSONBuilder();
             claims.putResource(Resource.NEW_REG);
-            if (!contacts.isEmpty()) {
+            if (contacts.isEmpty()) {
+                contacts.add(new URI("mailto:prasheelsoni11@gmail.com"));
+                contacts.add(new URI("tel:+919425964489"));
                 claims.put("contact", contacts);
             }
 

@@ -13,22 +13,6 @@
  */
 package org.shredzone.acme4j;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.shredzone.acme4j.util.TestUtils.*;
-import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.security.KeyPair;
-import java.security.cert.X509Certificate;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.lang.JoseException;
@@ -46,14 +30,32 @@ import org.shredzone.acme4j.util.JSON;
 import org.shredzone.acme4j.util.JSONBuilder;
 import org.shredzone.acme4j.util.TestUtils;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.security.KeyPair;
+import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.shredzone.acme4j.util.TestUtils.*;
+import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
+
+
 /**
  * Unit tests for {@link Registration}.
  */
 public class RegistrationTest {
 
-    private URI resourceUri  = URI.create("http://example.com/acme/resource");
-    private URI locationUri  = URI.create("http://example.com/acme/registration");
-    private URI agreementUri = URI.create("http://example.com/agreement.pdf");
+    private URI resourceUri  = URI.create("http://localhost:8000/acme/directory");
+    private URI locationUri  = URI.create("http://localhost:8000/acme/new-account");
+    private URI agreementUri = URI.create("http://www.pdf995.com/samples/pdf.pdf");
     private URI chainUri     = URI.create("http://example.com/acme/chain");
 
     /**
@@ -67,6 +69,10 @@ public class RegistrationTest {
 
             @Override
             public void sendSignedRequest(URI uri, JSONBuilder claims, Session session) {
+                System.out.println(claims.toString());
+                System.out.println(uri);
+                System.out.println(locationUri);
+
                 assertThat(uri, is(locationUri));
                 assertThat(claims.toString(), sameJSONAs(getJson("updateRegistration")));
                 assertThat(session, is(notNullValue()));
@@ -76,7 +82,7 @@ public class RegistrationTest {
 
             @Override
             public void sendRequest(URI uri, Session session) {
-                if (URI.create("https://example.com/acme/reg/1/authz").equals(uri)) {
+                if (URI.create("https://localhost:8000/acme/account/1/authz").equals(uri)) {
                     jsonResponse = new JSONBuilder()
                                 .array("authorizations", "https://example.com/acme/auth/1")
                                 .toJSON();
@@ -84,9 +90,9 @@ public class RegistrationTest {
                     return;
                 }
 
-                if (URI.create("https://example.com/acme/reg/1/cert").equals(uri)) {
+                if (URI.create("https://localhost:8000/acme/account/1/cert").equals(uri)) {
                     jsonResponse = new JSONBuilder()
-                                .array("certificates", "https://example.com/acme/cert/1")
+                                .array("certificates", "https://localhost:8000/acme/cert/1")
                                 .toJSON();
                     response = HttpURLConnection.HTTP_OK;
                     return;
@@ -551,7 +557,7 @@ public class RegistrationTest {
             @Override
             public void sendSignedRequest(URI uri, JSONBuilder claims, Session session) {
                 JSON json = claims.toJSON();
-                assertThat(json.get("resource").asString(), is("reg"));
+                assertThat(json.get("resource").asString(), is("account"));
                 assertThat(json.get("status").asString(), is("deactivated"));
                 assertThat(uri, is(locationUri));
                 assertThat(session, is(notNullValue()));
