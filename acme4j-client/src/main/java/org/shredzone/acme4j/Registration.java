@@ -152,7 +152,7 @@ public class Registration extends AcmeResource {
             claims.putResource("account");
             ArrayList<URI> contacts = new ArrayList<URI>();
             contacts.add(new URI("tel:1234567890"));
-            claims.put("contacts", contacts);
+            claims.put("contact", contacts);
 
             conn.sendSignedRequest(getLocation(), claims, getSession());
             conn.accept(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_ACCEPTED);
